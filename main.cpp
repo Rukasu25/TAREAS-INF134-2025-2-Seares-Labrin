@@ -1,6 +1,108 @@
 
 /* || MENSAJE PARA PATOSTARR ||*/
 /* IMPLEMENTAR CLASES DE GRAFO PARA CORRECTO FUNCIONAMIENTO DE CODIGO */
+#include<iostream>
+#include<fstream>
+#include<string>
+
+using namespace std;
+
+
+//se crea el struct nodo
+struct NodoAdy{
+    int id;
+    NodoAdy *sig;
+};
+
+//se implementa la clase grafo
+class Grafo{
+private:
+    int NumVertices;
+    int NumAristas;
+    NodoAdy **adyacencia; //este es arreglo de listas enlazadas
+
+    /* ****
+    * void agregarArco
+    ******
+    * Resumen Función
+    * Agrega una arista no dirigida entre u y v (agrega v a lista de u, y u a lista de v)
+    ******
+    * Input:
+    * int u : vértice origen
+    * int v : vértice destino
+    ******
+    * Returns:
+    * void
+    **** */
+    void agregarArco(int u, int v){
+        NodoAdy *aux=new NodoAdy;
+        aux->id=v;
+        aux->sig=adyacencia[u];
+        adyacencia[u]=aux;
+
+        aux->id=u;
+        aux->sig=adyacencia[v];
+        adyacencia[v]=aux;
+    }
+
+public:
+    //constructor del grafo a partir de un archivo
+    Grafo(string &archivo){
+        fstream file;
+        file.open("archivo", ios::in);
+        if(!file.is_open()){
+            NumVertices=0;
+            adyacencia=NULL;
+            return;
+        }
+
+        file>>NumVertices>>NumAristas; //rescatamos el numero de vertices y la cantidad de arcos
+
+        adyacencia=new NodoAdy *[NumAristas];//creamos el arreglo que guarda las conexiones (grafo utilizando listas enlazadas)
+        int i;
+        for(i=0; i<NumVertices; i++){
+            adyacencia[i]=NULL;//seteamos las cabeceras a las listas com0o null
+        }
+
+        //ahora creamos los arcos correspondientes a cada nodo
+        for(i=0; i<NumVertices; i++){
+            int u, v;
+            file>>u>>v;
+            if(u>=0 && u<NumVertices && v>=0 && v< NumAristas && u!=v){
+                agregarArco(u,v);
+            }
+        }
+
+        file.close();
+
+    }
+
+    //destructor
+    ~Grafo(){
+        if(adyacencia==NULL) return;
+
+        for(int i=0; i<NumVertices;i++){
+            NodoAdy *aux=adyacencia[i];
+            while(aux !=NULL){
+                NodoAdy* temp=aux;
+                aux=aux->sig;
+                delete temp;
+                
+            }
+        }
+        delete[] adyacencia;
+    }
+    
+
+};
+
+
+
+
+
+
+
+
 
 
 //funcion Sugerir_Amigos [TIPO DE FUNCION EN DESARROLLO, POTENCIALMENTE CLASE GRAFO o LISTA]
