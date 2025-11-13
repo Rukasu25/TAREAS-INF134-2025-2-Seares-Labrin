@@ -35,21 +35,22 @@ private:
     * void
     **** */
     void agregarArco(int u, int v){
-        NodoAdy *aux=new NodoAdy;
-        aux->id=v;
-        aux->sig=adyacencia[u];
-        adyacencia[u]=aux;
+        NodoAdy *nuevoNodoV=new NodoAdy;
+        nuevoNodoV->id=v;
+        nuevoNodoV->sig=adyacencia[u];
+        adyacencia[u]=nuevoNodoV;
 
-        aux->id=u;
-        aux->sig=adyacencia[v];
-        adyacencia[v]=aux;
+        NodoAdy *nuevoNodoU=new NodoAdy;
+        nuevoNodoU->id=u;
+        nuevoNodoU->sig=adyacencia[v];
+        adyacencia[v]=nuevoNodoU;
     }
 
 public:
     //constructor del grafo a partir de un archivo
     Grafo(string &archivo){
         fstream file;
-        file.open("archivo", ios::in);
+        file.open("datos", ios::in);
         if(!file.is_open()){
             NumVertices=0;
             adyacencia=NULL;
@@ -58,17 +59,17 @@ public:
 
         file>>NumVertices>>NumAristas; //rescatamos el numero de vertices y la cantidad de arcos
 
-        adyacencia=new NodoAdy *[NumAristas];//creamos el arreglo que guarda las conexiones (grafo utilizando listas enlazadas)
+        adyacencia=new NodoAdy *[NumVertices];//creamos el arreglo que guarda las conexiones (grafo utilizando listas enlazadas)
         int i;
         for(i=0; i<NumVertices; i++){
             adyacencia[i]=NULL;//seteamos las cabeceras a las listas com0o null
         }
 
         //ahora creamos los arcos correspondientes a cada nodo
-        for(i=0; i<NumVertices; i++){
+        for(i=0; i<NumAristas; i++){
             int u, v;
             file>>u>>v;
-            if(u>=0 && u<NumVertices && v>=0 && v< NumAristas && u!=v){
+            if(u>=0 && u<NumVertices && v>=0 && v< NumVertices && u!=v){
                 agregarArco(u,v);
             }
         }
@@ -76,6 +77,57 @@ public:
         file.close();
 
     }
+
+
+    /* ****
+    * NodoAdy* sugerir_amigos
+    ******
+    * Resumen Función
+    * Retornar una lista de usuarios que están a exactamente 2 grados de distancia del usuario dado (amigos de amigos) y que aún no son amigos directos. 
+    * input:
+    * int id_usuario : ID del usuario para el cual se sugieren amigos
+    ******
+    * Returns:
+    * NodoAdy* : Lista enlazada de IDs de usuarios sugeridos como amigos
+    **** */    
+    NodoAdy* sugerir_amigos(int id_usuario){ 
+        NodoAdy* listaSugeridos = nullptr;
+        NodoAdy* amigosDirectos = adyacencia[id_usuario];
+
+        // Marcar amigos directos
+        bool* esAmigoDirecto = new bool[NumVertices]();
+        for(int i = 0; i < NumVertices; i++) {
+            esAmigoDirecto[i] = false;
+        }
+        esAmigoDirecto[id_usuario] = true; // El usuario no es su propio amigo
+        NodoAdy* Nivel1 = adyacencia[id_usuario];
+        while(Nivel1 != nullptr) {
+            esAmigoDirecto[Nivel1->id] = true;
+            Nivel1 = Nivel1->sig;
+        }
+
+        Nivel1 = adyacencia[id_usuario];
+        while(Nivel1 != nullptr){
+            NodoAdy* Nivel2 = adyacencia[Nivel1->id];
+            while(Nivel2 != nullptr){
+                if(esAmigoDirecto[Nivel2->id] == false){
+                    NodoAdy* SugerenciaDeAmistad = new NodoAdy;
+                    SugerenciaDeAmistad->id = Nivel2->id;
+                    SugerenciaDeAmistad->sig = listaSugeridos;
+                    listaSugeridos = SugerenciaDeAmistad;
+                    esAmigoDirecto[Nivel2->id] = true; // se marca como sugerido para evitar duplicados
+
+                }
+                Nivel2 = Nivel2->sig;
+
+            }
+            Nivel1 = Nivel1->sig;
+                
+        }
+        delete[] esAmigoDirecto;
+        return listaSugeridos;
+    
+    };
 
     //destructor
     ~Grafo(){
@@ -103,12 +155,13 @@ public:
 
 
 
-
+/*
 
 //funcion Sugerir_Amigos [TIPO DE FUNCION EN DESARROLLO, POTENCIALMENTE CLASE GRAFO o LISTA]
 // Retornar una lista de usuarios que están a exactamente 2 grados de distancia del usuario dado (amigos de amigos) y que aún no son amigos directos. Ejemplo: En el grafo de la Figura 1, sugerirAmigos(9) deber´ıa retornar {5, 7, 11, 12, 14}, ya que son amigos de los amigos de 9 pero no son amigos directos de 9.
-lista sugerir_amigos(int id_usuario){
-    //IMPLEMENTAR FUNCION
+int* sugerir_amigos(int id_usuario){ 
+    for (int i = 0; i < datos.txt )
+    
 };
 
 
@@ -144,10 +197,13 @@ int calcular_influencia(int id_usuario){
 encontrar_puentes(){
     //IMPLEMENTAR FUNCION
 }
-
+*/
 
 int main(){
-    int id_usuario;
+    cout << "Iniciando programa..." << endl;
+    string archivo="datos.txt";
+    Grafo grafo(archivo);
+    grafo.sugerir_amigos(9);
 
     return 0;
 }
