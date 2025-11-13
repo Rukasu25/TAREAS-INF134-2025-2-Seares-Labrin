@@ -50,8 +50,9 @@ public:
     //constructor del grafo a partir de un archivo
     Grafo(string &archivo){
         fstream file;
-        file.open("datos", ios::in);
+        file.open(archivo.c_str(), ios::in);
         if(!file.is_open()){
+            cout<<"Error al abrir el archivo"<<endl;
             NumVertices=0;
             adyacencia=NULL;
             return;
