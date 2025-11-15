@@ -46,6 +46,38 @@ private:
         adyacencia[v]=nuevoNodoU;
     }
 
+    /* ****
+    * void dfs
+    ******
+    * Resumen Función
+    * Recorrido de Búsqueda en Profundidad (DFS). Marca todos los nodos
+    * alcanzables desde 'u' como visitados.
+    ******
+    * Input:
+    * int u : El vértice actual desde donde se explora
+    * bool* visitado : El array de nodos visitados
+    ******
+    * Returns:
+    * void
+    **** */
+    void dfs(int u, bool* visitado) {
+        // 1. Marcar el nodo actual como visitado
+        visitado[u] = true;
+
+        // 2. Recorrer todos sus vecinos (amigos)
+        NodoAdy* aux = adyacencia[u];
+        while (aux != NULL) {
+            int v = aux->id;
+            
+            // 3. Si el vecino 'v' no ha sido visitado, llamarse
+            //    recursivamente desde 'v'.
+            if (visitado[v] == false) {
+                dfs(v, visitado);
+            }
+            aux = aux->sig;
+        }
+    }
+
 public:
     //constructor del grafo a partir de un archivo
     Grafo(string &archivo){
@@ -144,6 +176,30 @@ public:
         return listaSugeridos;
     
     };
+    /* ****
+    * int contar_comunidades
+    ******
+    * Resumen Función
+    * Retornar el número de componentes conexas del grafo. Cada componente representa un grupo aislado de usuarios, en el que todos están conectados entre sí de alguna forma, pero no tienen conexión con otros grupos.
+    * input:
+    * Ninguno 
+    ******
+    * Returns:
+    * int : cantidad de comunidades en el grafo
+    **** */    
+    int contar_comunidades(NodoAdy* inicio){
+        NodoAdy *aux=inicio;
+        int contador=0;
+        bool* visitado=new bool[NumVertices];
+        for(int i=0;i<NumVertices;i++){
+            if (visitado[i]==false){
+                contador++;
+                dfs(i, visitado);
+            }
+        }
+        delete[] visitado;
+        return contador;
+    }
 
 
     /* ****
@@ -205,7 +261,7 @@ int* sugerir_amigos(int id_usuario){
 // Identificar y retornar el ID del usuario con el mayor número de conexiones directas (mayor grado del grafo). En caso de empate, puede retornar cualquiera de los usuarios empatados. Ejemplo: En el grafo de la Figura 1, esta función debería analizar los grados de todos los nodos y retornar el usuario con más amigos, el cual corresponde a: 1, el cual tiene 6 amigos.
 
 int usuario_mas_popular(){
-    //IMPLEMENTAR FUNCION
+
 };
 
 
@@ -214,7 +270,7 @@ int usuario_mas_popular(){
 // Calcular el número de componentes conexas del grafo. Cada componente representa un grupo aislado de usuarios, en el que todos est´an conectados entre sí de alguna forma, pero no tienen conexión con otros grupos. Ejemplo: En el grafo de ejemplo de la Figura 1 el valor sería 1, ya que solo hay una comunidad, pero si se elimina el nodo 9, deberían contabilizarse dos comunidades.
 
 int contar_comunidades(){
-    //IMPLEMENTAR FUNCION
+
 };
 
 
@@ -223,7 +279,7 @@ int contar_comunidades(){
 
 
 int calcular_influencia(int id_usuario){
-    //IMPLEMENTAR FUNCION
+
 };
 
 
@@ -231,7 +287,7 @@ int calcular_influencia(int id_usuario){
 //Encontrar nodos que son cruciales para conectar comunidades en el grafo. Ejemplo: En el grafo 1 la función retornaría {9}, debido a que al eliminarlo quedarán dos comunidades cuando originalmente había una.
 
 encontrar_puentes(){
-    //IMPLEMENTAR FUNCION
+
 }
 */
 
