@@ -79,6 +79,21 @@ public:
 
     }
 
+    //destructor
+    ~Grafo(){
+        if(adyacencia==NULL) return;
+
+        for(int i=0; i<NumVertices;i++){
+            NodoAdy *aux=adyacencia[i];
+            while(aux !=NULL){
+                NodoAdy* temp=aux;
+                aux=aux->sig;
+                delete temp;
+                
+            }
+        }
+        delete[] adyacencia;
+    }
 
     /* ****
     * NodoAdy* sugerir_amigos
@@ -130,20 +145,40 @@ public:
     
     };
 
-    //destructor
-    ~Grafo(){
-        if(adyacencia==NULL) return;
 
-        for(int i=0; i<NumVertices;i++){
-            NodoAdy *aux=adyacencia[i];
-            while(aux !=NULL){
-                NodoAdy* temp=aux;
+    /* ****
+    * int usuario_mas_popular
+    ******
+    * Resumen Función
+    * retorna el id del usuario más popular 
+    * input:
+    * sin inputs
+    ******
+    * Returns:
+    * int
+    **** */
+    int usuario_mas_popular(){
+        int mas_vecinos=0;
+        int id_popular;
+
+        for(int i=0; i< NumVertices; i++){
+            int count=0;//este es un contador auxiliar para contar los vecinos de cada nodo
+            NodoAdy *aux=adyacencia[i]; //creo un nodo auxiliar recorrer la lista enlazada
+            while(adyacencia[i]->sig==NULL){
+                count++;
                 aux=aux->sig;
-                delete temp;
-                
+            }
+            if(count>mas_vecinos){
+                mas_vecinos=count;
+                id_popular=i;
             }
         }
-        delete[] adyacencia;
+        return id_popular;
+    }
+
+
+    int encontrar_puentes(){ //funcion 5
+
     }
     
 
@@ -204,7 +239,8 @@ int main(){
     cout << "Iniciando programa..." << endl;
     string archivo="datos.txt";
     Grafo grafo(archivo);
-    grafo.sugerir_amigos(9);
+    grafo.sugerir_amigos(9); 
+    cout<<grafo.usuario_mas_popular();
 
     return 0;
 }
