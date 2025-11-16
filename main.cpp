@@ -201,6 +201,34 @@ public:
         return contador;
     }
 
+    /* ****
+    * int Calcular_Influencia
+    ******
+    * Resumen Función
+    * Calcular el nivel de influencia de un usuario específico, definido como el número total de usuarios que puede alcanzar a través de sus amigos (amigos directos + amigos de amigos directos, sin repetición).
+    * input:
+    * int id_usuario : ID del usuario para el cual se calcula la influencia
+    ******
+    * Returns:
+    * int : nivel de influencia del usuario
+    **** */  
+    int Calcular_Influencia(int id_usuario){
+        bool* visitado= new bool[NumVertices];
+        for (int i= 0; i<NumVertices; i++){
+            visitado[i]= false;
+        }
+        dfs(id_usuario, visitado);
+        int influencia = 0;
+        for (int i=0; i<NumVertices; i++){
+            if (visitado[i]== true){
+                influencia++;
+            }
+        }
+        delete[] visitado;
+        return influencia - 1; // se resta 1 para que no se cuente al usuario mismo
+
+    }
+
 
     /* ****
     * int usuario_mas_popular
