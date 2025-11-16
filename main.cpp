@@ -234,7 +234,7 @@ public:
 
 
     int encontrar_puentes(){ //funcion 5
-
+        
     }
     
 
