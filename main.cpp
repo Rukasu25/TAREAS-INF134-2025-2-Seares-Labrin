@@ -122,17 +122,17 @@ private:
             
             // u es nodo de articulación en los siguientes casos:
             
-                if (padre[u] == -1 && hijos > 1) {
+                if(padre[u] == -1 && hijos > 1){
                     esArticulacion[u]=true;
                 }
             
-                if (padre[u] != -1 && low[v] >= tiempoDescubrimiento[u]) {
+                if(padre[u] != -1 && low[v] >= tiempoDescubrimiento[u]){
                     esArticulacion[u]=true;
                 }
             }
         
             //actualizar low value de u para los ancestros
-            else if (v != padre[u]) {
+            else if(v != padre[u]){
                 low[u]=(low[u] < tiempoDescubrimiento[v]) ? low[u] : tiempoDescubrimiento[v];
             }
         
@@ -371,70 +371,92 @@ public:
         return -1;
 
     }
-    
 
+    //funcion para obtener el numero de vertices
+    int nVertex(){
+        return NumVertices;
+    }
+    
+    //esta funcion se creo para ver si un nodo esta en el grafo o no
+    bool existenciaNodo(int id){
+        
+        for(int i=0; i<NumVertices; i++){
+            if(adyacencia[i]->id==id){
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 
-void Menu(){    //esta es la interfaz del usuario
+void Menu(Grafo &grafo){    //esta es la interfaz del usuario
+    cout<<"---SANSABOOK---\n"<<endl;
+    int opcion;
+    do{
+        cout<<"1. Sugerencia de Amigos"<<endl;
+        cout<<"2. Usuario Más Popular"<<endl;
+        cout<<"3. Contar Comunidades"<<endl;
+        cout<<"4. Influencia Usuario"<<endl;
+        cout<<"5. Cantidad de Puentes"<<endl;
+        cout<<"0. Salir"<<endl;
+
+        cout<<"\nElige una Opción: "; cin>>opcion;
+
+        if(opcion==1){
+            int id;
+
+            cout<<"Escribe un usuario: "; cin>>id;
+            bool existe= grafo.existenciaNodo(id);
+            NodoAdy *aux= grafo.sugerir_amigos(id);
+
+            if(existe==false) cout<<"usuario no encontrado"<<endl;
+            else if(aux==NULL){
+                cout<<"no se pueden sugerir amigos"<<endl;
+            }
+            else{
+                cout<<"{";
+                while(aux!=NULL){
+                    cout<<aux->id<<", ";
+                }
+                cout<<"}";
+            }
+        }
+
+        if(opcion==2){
+            cout<<grafo.usuario_mas_popular()<<endl;
+        }
+
+        if(opcion==3){
+            //cout<<grafo.contar_comunidades()<<endl;
+        }
+
+        if(opcion==4){
+            int id;
+            cout<<"Ingresa un usuario: "; cin>>id;
+            bool existe=grafo.existenciaNodo(id);
+
+            if(!existe) cout<<"usuario no encontrado"<<endl;
+            else{
+                cout<<grafo.Calcular_Influencia(id)<<endl;
+            }
+        }
+
+        if(opcion==5){
+            cout<<grafo.encontrar_puentes()<<endl;
+        }
+
+    }while(opcion!=0);
     
 }
 
 
-
-
-
-
-/*
-
-//funcion Sugerir_Amigos [TIPO DE FUNCION EN DESARROLLO, POTENCIALMENTE CLASE GRAFO o LISTA]
-// Retornar una lista de usuarios que están a exactamente 2 grados de distancia del usuario dado (amigos de amigos) y que aún no son amigos directos. Ejemplo: En el grafo de la Figura 1, sugerirAmigos(9) deber´ıa retornar {5, 7, 11, 12, 14}, ya que son amigos de los amigos de 9 pero no son amigos directos de 9.
-int* sugerir_amigos(int id_usuario){ 
-    for (int i = 0; i < datos.txt )
-    
-};
-
-
-//funcion usuario_mas_popular, Tipo de funcion = Int.
-// Identificar y retornar el ID del usuario con el mayor número de conexiones directas (mayor grado del grafo). En caso de empate, puede retornar cualquiera de los usuarios empatados. Ejemplo: En el grafo de la Figura 1, esta función debería analizar los grados de todos los nodos y retornar el usuario con más amigos, el cual corresponde a: 1, el cual tiene 6 amigos.
-
-int usuario_mas_popular(){
-
-};
-
-
-
-//funcion contar_comunidades, Tipo de funcion = Int.
-// Calcular el número de componentes conexas del grafo. Cada componente representa un grupo aislado de usuarios, en el que todos est´an conectados entre sí de alguna forma, pero no tienen conexión con otros grupos. Ejemplo: En el grafo de ejemplo de la Figura 1 el valor sería 1, ya que solo hay una comunidad, pero si se elimina el nodo 9, deberían contabilizarse dos comunidades.
-
-int contar_comunidades(){
-
-};
-
-
-//funcion calcular_influencia, Tipo de funcion = int.
-//Calcular el nivel de influencia de un usuario específico, definido como el número total de usuarios que puede alcanzar a través de sus amigos (amigos directos + amigos de amigos directos, sin repetici´on). Este valor representa qué tan conectado está un usuario en la red. Ejemplo: Si un usuario tiene 3 amigos directos, y estos amigos tienen en total 10 amigos únicos (excluyendo al usuario original y duplicados), su nivel de influencia sería 13. Para el caso del nodo 1, su nivel de influencia ser´ıa de 6 amigos directos + 2 amigos de amigos, con un total de influencia de 8.
-
-
-int calcular_influencia(int id_usuario){
-
-};
-
-
-//funcion encontrar_puentes, Tipo de funcion = sin definir aun
-//Encontrar nodos que son cruciales para conectar comunidades en el grafo. Ejemplo: En el grafo 1 la función retornaría {9}, debido a que al eliminarlo quedarán dos comunidades cuando originalmente había una.
-
-encontrar_puentes(){
-
-}
-*/
 
 int main(){
-    cout << "Iniciando programa..." << endl;
+
     string archivo="datos.txt";
     Grafo grafo(archivo);
-    grafo.sugerir_amigos(9); 
-    cout<<grafo.usuario_mas_popular();
+    Menu(grafo);
 
     return 0;
 }
