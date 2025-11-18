@@ -108,7 +108,7 @@ private:
         //recorrer todos los vértices adyacentes
         NodoAdy* aux=adyacencia[u];
         while (aux != nullptr) {
-        int v=aux->id;
+            int v=aux->id;
         
             if (!visitado[v]) {
                 hijos++;
@@ -339,6 +339,7 @@ public:
             visitado[i]=false;
             padre[i]=-1;
             esArticulacion[i]=false;
+            low[i]=-1;
         }
 
         int tiempo=0;
