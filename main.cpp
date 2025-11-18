@@ -78,6 +78,68 @@ private:
         }
     }
 
+    /* ****
+    * void encontrarPuentesDFS
+    ******
+    * Resumen Función
+    * este es un dfs que me ayudará a encontrar aquellos nodos que son puntos de articulación
+    ******
+    * Input:
+    * int u: vértice actual
+    * bool* visitado: array de vértices visitados
+    * int* tiempoDescubrimiento: tiempos de descubrimiento en DFS
+    * int* low: valores low para encontrar componentes
+    * int* padre: padres en el árbol DFS
+    * bool* esArticulacion: marca nodos de articulación
+    * int& tiempo: contador de tiempo
+    ******
+    * Returns:
+    * void
+    **** */
+    void encontrarPuentesDFS(int u, bool* visitado, int* tiempoDescubrimiento, int* low, int* padre, bool* esArticulacion, int& tiempo) {
+        int hijos=0;
+    
+        //marcar el nodo actual como visitado
+        visitado[u]=true;
+    
+        //inicializar tiempo de descubrimiento y valor low
+        tiempoDescubrimiento[u]= low[u]= ++tiempo;
+    
+        //recorrer todos los vértices adyacentes
+        NodoAdy* aux=adyacencia[u];
+        while (aux != nullptr) {
+        int v=aux->id;
+        
+            if (!visitado[v]) {
+                hijos++;
+                padre[v]= u;
+            
+            //llamada recursiva para v
+                encontrarPuentesDFS(v, visitado, tiempoDescubrimiento, low, padre, esArticulacion, tiempo);
+            
+            //revisar si el subárbol con raíz en v tiene conexión con ancestros de u
+                low[u]=(low[u] < low[v]) ? low[u] : low[v];
+            
+            // u es nodo de articulación en los siguientes casos:
+            
+                if (padre[u] == -1 && hijos > 1) {
+                    esArticulacion[u]=true;
+                }
+            
+                if (padre[u] != -1 && low[v] >= tiempoDescubrimiento[u]) {
+                    esArticulacion[u]=true;
+                }
+            }
+        
+            //actualizar low value de u para los ancestros
+            else if (v != padre[u]) {
+                low[u]=(low[u] < tiempoDescubrimiento[v]) ? low[u] : tiempoDescubrimiento[v];
+            }
+        
+            aux=aux->sig;
+        }
+    }   
+
 public:
     //constructor del grafo a partir de un archivo
     Grafo(string &archivo){
@@ -111,6 +173,21 @@ public:
 
     }
 
+    //destructor
+    ~Grafo(){
+        if(adyacencia==NULL) return;
+
+        for(int i=0; i<NumVertices;i++){
+            NodoAdy *aux=adyacencia[i];
+            while(aux !=NULL){
+                NodoAdy* temp=aux;
+                aux=aux->sig;
+                delete temp;
+                
+            }
+        }
+        delete[] adyacencia;
+    }
 
     /* ****
     * NodoAdy* sugerir_amigos
@@ -214,26 +291,94 @@ public:
 
     }
 
-    //destructor
-    ~Grafo(){
-        if(adyacencia==NULL) return;
 
-        for(int i=0; i<NumVertices;i++){
-            NodoAdy *aux=adyacencia[i];
-            while(aux !=NULL){
-                NodoAdy* temp=aux;
+    /* ****
+    * int usuario_mas_popular
+    ******
+    * Resumen Función
+    * retorna el id del usuario más popular 
+    * input:
+    * sin inputs
+    ******
+    * Returns:
+    * int
+    **** */
+    int usuario_mas_popular(){
+        int mas_vecinos=0;
+        int id_popular;
+
+        for(int i=0; i< NumVertices; i++){
+            int count=0;//este es un contador auxiliar para contar los vecinos de cada nodo
+            NodoAdy *aux=adyacencia[i]; //creo un nodo auxiliar recorrer la lista enlazada
+            while(adyacencia[i]->sig==NULL){
+                count++;
                 aux=aux->sig;
-                delete temp;
-                
+            }
+            if(count>mas_vecinos){
+                mas_vecinos=count;
+                id_popular=i;
             }
         }
-        delete[] adyacencia;
+        return id_popular;
+    }
+
+
+
+    int encontrar_puentes(){ //funcion 5
+        if(NumVertices==0) return -1;
+
+        //ahora usaremos el dfs especial para ver nodos de articulacion (nodos que al eliminarlos hacen que mi grafo sea desconexo)
+        bool *visitado=new bool[NumVertices];
+        int *tiempoDescubrimiento=new int[NumVertices];
+        int *low=new int[NumVertices];
+        int *padre=new int[NumVertices];
+        bool *esArticulacion=new bool[NumVertices];
+
+        //inicializamos los arreglos
+        for(int i=0; i<NumVertices; i++){
+            visitado[i]=false;
+            padre[i]=-1;
+            esArticulacion[i]=false;
+        }
+
+        int tiempo=0;
+
+        //ahora se aplica el dfs ese para cada nodo
+        for(int i=0; i<NumVertices; i++){
+            if(visitado[i]==false) encontrarPuentesDFS(i, visitado, tiempoDescubrimiento, low, padre, esArticulacion, tiempo);
+        }
+
+        //luego se busca el primer nodo de articulación
+        for(int i=0; i<NumVertices; i++){
+            if(esArticulacion[i]){
+                delete[] visitado;
+                delete[] tiempoDescubrimiento;
+                delete[] low;
+                delete[] padre;
+                delete[] esArticulacion;
+
+                return i;
+            }
+        }
+
+        //si no se encontro un nodo puente:
+        delete[] visitado;
+        delete[] tiempoDescubrimiento;
+        delete[] low;
+        delete[] padre;
+        delete[] esArticulacion;
+
+        return -1;
+
     }
     
 
 };
 
 
+void Menu(){    //esta es la interfaz del usuario
+    
+}
 
 
 
@@ -288,7 +433,8 @@ int main(){
     cout << "Iniciando programa..." << endl;
     string archivo="datos.txt";
     Grafo grafo(archivo);
-    grafo.sugerir_amigos(9);
+    grafo.sugerir_amigos(9); 
+    cout<<grafo.usuario_mas_popular();
 
     return 0;
 }
