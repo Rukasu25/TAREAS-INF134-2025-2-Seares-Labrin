@@ -1,4 +1,3 @@
-
 /* || MENSAJE PARA PATOSTARR ||*/
 /* IMPLEMENTAR CLASES DE GRAFO PARA CORRECTO FUNCIONAMIENTO DE CODIGO */
 #include<iostream>
@@ -201,9 +200,11 @@ public:
     * NodoAdy* : Lista enlazada de IDs de usuarios sugeridos como amigos
     **** */    
     NodoAdy* sugerir_amigos(int id_usuario){ 
+        
+        if (0 > id_usuario || id_usuario >= NumVertices) {
+            return nullptr; // ID de usuario inválido
+        }
         NodoAdy* listaSugeridos = nullptr;
-        NodoAdy* amigosDirectos = adyacencia[id_usuario];
-
         // Marcar amigos directos
         bool* esAmigoDirecto = new bool[NumVertices]();
         for(int i = 0; i < NumVertices; i++) {
@@ -249,11 +250,13 @@ public:
     * Returns:
     * int : cantidad de comunidades en el grafo
     **** */    
-    int contar_comunidades(NodoAdy* inicio){
-        NodoAdy *aux=inicio;
+    int contar_comunidades(){
         int contador=0;
         bool* visitado=new bool[NumVertices];
         for(int i=0;i<NumVertices;i++){
+            visitado[i]= false;
+        }
+        for(int i=0; i<NumVertices; i++){
             if (visitado[i]==false){
                 contador++;
                 dfs(i, visitado);
@@ -275,6 +278,7 @@ public:
     * int : nivel de influencia del usuario
     **** */  
     int Calcular_Influencia(int id_usuario){
+        if (id_usuario < 0 || id_usuario >= NumVertices) return -1;
         bool* visitado= new bool[NumVertices];
         for (int i= 0; i<NumVertices; i++){
             visitado[i]= false;
@@ -304,13 +308,15 @@ public:
     * int
     **** */
     int usuario_mas_popular(){
+        if (NumVertices==0) return -1;
         int mas_vecinos=0;
-        int id_popular;
+        int id_popular=0;
 
         for(int i=0; i< NumVertices; i++){
             int count=0;//este es un contador auxiliar para contar los vecinos de cada nodo
             NodoAdy *aux=adyacencia[i]; //creo un nodo auxiliar recorrer la lista enlazada
-            while(adyacencia[i]->sig==NULL){
+            
+            while(aux !=nullptr){
                 count++;
                 aux=aux->sig;
             }
@@ -318,11 +324,13 @@ public:
                 mas_vecinos=count;
                 id_popular=i;
             }
+
+            
         }
         return id_popular;
     }
 
-
+//REVISAR
 
     int encontrar_puentes(){ //funcion 5
         if(NumVertices==0) return -1;
@@ -379,16 +387,53 @@ public:
     
     //esta funcion se creo para ver si un nodo esta en el grafo o no
     bool existenciaNodo(int id){
-        
+        /*
         for(int i=0; i<NumVertices; i++){
             if(adyacencia[i]->id==id){
                 return true;
             }
         }
         return false;
+        */
+        return id >= 0 && id < NumVertices; //version ultrasimplificada
     }
 };
 
+
+
+//placeholder
+/*
+void contarPuentesDFS(int u, bool visited[], int disc[], int low[], int parent[], int &time, int &bridgeCount) {
+    visited[u] = true;
+    disc[u] = low[u] = ++time;
+    for (NodoAdy* aux = adyacencia[u]; aux != nullptr; aux = aux->sig) {
+        int v = aux->id;
+        if (!visited[v]) {
+            parent[v] = u;
+            contarPuentesDFS(v, visited, disc, low, parent, time, bridgeCount);
+            low[u] = min(low[u], low[v]);
+            if (low[v] > disc[u]) ++bridgeCount; // (u,v) es puente
+        } else if (v != parent[u]) {
+            low[u] = min(low[u], disc[v]);
+        }
+        aux = aux->sig;
+    }
+}
+
+int encontrar_puentes() {
+    if (NumVertices == 0) return 0;
+    bool* visited = new bool[NumVertices];
+    int* disc = new int[NumVertices];
+    int* low = new int[NumVertices];
+    int* parent = new int[NumVertices];
+    for (int i = 0; i < NumVertices; ++i) { visited[i] = false; parent[i] = -1; disc[i] = 0; low[i] = 0; }
+    int time = 0, bridgeCount = 0;
+    for (int i = 0; i < NumVertices; ++i)
+        if (!visited[i]) contarPuentesDFS(i, visited, disc, low, parent, time, bridgeCount);
+    delete[] visited; delete[] disc; delete[] low; delete[] parent;
+    return bridgeCount;
+}
+*/
 
 void Menu(Grafo &grafo){    //esta es la interfaz del usuario
     cout<<"---SANSABOOK---\n"<<endl;
@@ -407,7 +452,7 @@ void Menu(Grafo &grafo){    //esta es la interfaz del usuario
             int id;
 
             cout<<"Escribe un usuario: "; cin>>id;
-            bool existe= grafo.existenciaNodo(id);
+            bool existe = grafo.existenciaNodo(id);
             NodoAdy *aux= grafo.sugerir_amigos(id);
 
             if(existe==false) cout<<"usuario no encontrado"<<endl;
@@ -415,11 +460,18 @@ void Menu(Grafo &grafo){    //esta es la interfaz del usuario
                 cout<<"no se pueden sugerir amigos"<<endl;
             }
             else{
-                cout<<"{";
-                while(aux!=NULL){
-                    cout<<aux->id<<", ";
+                NodoAdy* it = aux;
+                bool first = true;
+                cout << "{";
+                while (it != nullptr) {
+                    if (!first) cout << ", ";
+                    cout << it->id;
+                    first = false;
+                    NodoAdy* tmp = it;
+                    it = it->sig;
+                    delete tmp; // liberar nodo retornado por sugerir_amigos
                 }
-                cout<<"}";
+                cout << "}" << endl;
             }
         }
 
@@ -428,7 +480,7 @@ void Menu(Grafo &grafo){    //esta es la interfaz del usuario
         }
 
         if(opcion==3){
-            //cout<<grafo.contar_comunidades()<<endl;
+            cout<<grafo.contar_comunidades()<<endl;
         }
 
         if(opcion==4){
