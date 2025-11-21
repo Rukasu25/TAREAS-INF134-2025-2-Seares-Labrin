@@ -283,15 +283,36 @@ public:
         for (int i= 0; i<NumVertices; i++){
             visitado[i]= false;
         }
-        dfs(id_usuario, visitado);
+
+        visitado[id_usuario]= true;
+
         int influencia = 0;
-        for (int i=0; i<NumVertices; i++){
-            if (visitado[i]== true){
+        //amigos directos
+        NodoAdy* Nivel1 = adyacencia[id_usuario];
+        while(Nivel1 != nullptr){
+            int amigo = Nivel1->id;
+            if(!visitado[amigo]){
+                visitado[amigo]= true;
                 influencia++;
             }
+            Nivel1 = Nivel1->sig;
+        }
+        //amigos de amigos
+        Nivel1 = adyacencia[id_usuario];
+        while(Nivel1 != nullptr){
+            NodoAdy* Nivel2 = adyacencia[Nivel1->id];
+            while(Nivel2 != nullptr){
+                int amigoDeAmigo = Nivel2->id;
+                if(!visitado[amigoDeAmigo]){
+                    visitado[amigoDeAmigo]= true;
+                    influencia++;
+                }
+                Nivel2 = Nivel2->sig;
+            }
+            Nivel1 = Nivel1->sig;
         }
         delete[] visitado;
-        return influencia - 1; // se resta 1 para que no se cuente al usuario mismo
+        return influencia;
 
     }
 
@@ -332,8 +353,8 @@ public:
 
 //REVISAR
 
-    int encontrar_puentes(){ //funcion 5
-        if(NumVertices==0) return -1;
+    NodoAdy* encontrar_puentes(){ //funcion 5
+        if(NumVertices==0) return nullptr;
 
         //ahora usaremos el dfs especial para ver nodos de articulacion (nodos que al eliminarlos hacen que mi grafo sea desconexo)
         bool *visitado=new bool[NumVertices];
@@ -356,27 +377,24 @@ public:
             if(visitado[i]==false) encontrarPuentesDFS(i, visitado, tiempoDescubrimiento, low, padre, esArticulacion, tiempo);
         }
 
-        //luego se busca el primer nodo de articulación
-        for(int i=0; i<NumVertices; i++){
+        //luego se buscan los nodos de articulación
+        NodoAdy* listapuentes = nullptr;
+        for(int i = 0; i<NumVertices; i++){
             if(esArticulacion[i]){
-                delete[] visitado;
-                delete[] tiempoDescubrimiento;
-                delete[] low;
-                delete[] padre;
-                delete[] esArticulacion;
-
-                return i;
+                NodoAdy* resultado = new NodoAdy;
+                resultado->id = i;
+                resultado->sig = listapuentes;
+                listapuentes= resultado;
             }
         }
 
-        //si no se encontro un nodo puente:
         delete[] visitado;
         delete[] tiempoDescubrimiento;
         delete[] low;
         delete[] padre;
         delete[] esArticulacion;
 
-        return -1;
+        return listapuentes; //si no se llega a encontrar nodos de articulación, se retornará como un nullptr
 
     }
 
@@ -387,53 +405,10 @@ public:
     
     //esta funcion se creo para ver si un nodo esta en el grafo o no
     bool existenciaNodo(int id){
-        /*
-        for(int i=0; i<NumVertices; i++){
-            if(adyacencia[i]->id==id){
-                return true;
-            }
-        }
-        return false;
-        */
         return id >= 0 && id < NumVertices; //version ultrasimplificada
     }
 };
 
-
-
-//placeholder
-/*
-void contarPuentesDFS(int u, bool visited[], int disc[], int low[], int parent[], int &time, int &bridgeCount) {
-    visited[u] = true;
-    disc[u] = low[u] = ++time;
-    for (NodoAdy* aux = adyacencia[u]; aux != nullptr; aux = aux->sig) {
-        int v = aux->id;
-        if (!visited[v]) {
-            parent[v] = u;
-            contarPuentesDFS(v, visited, disc, low, parent, time, bridgeCount);
-            low[u] = min(low[u], low[v]);
-            if (low[v] > disc[u]) ++bridgeCount; // (u,v) es puente
-        } else if (v != parent[u]) {
-            low[u] = min(low[u], disc[v]);
-        }
-        aux = aux->sig;
-    }
-}
-
-int encontrar_puentes() {
-    if (NumVertices == 0) return 0;
-    bool* visited = new bool[NumVertices];
-    int* disc = new int[NumVertices];
-    int* low = new int[NumVertices];
-    int* parent = new int[NumVertices];
-    for (int i = 0; i < NumVertices; ++i) { visited[i] = false; parent[i] = -1; disc[i] = 0; low[i] = 0; }
-    int time = 0, bridgeCount = 0;
-    for (int i = 0; i < NumVertices; ++i)
-        if (!visited[i]) contarPuentesDFS(i, visited, disc, low, parent, time, bridgeCount);
-    delete[] visited; delete[] disc; delete[] low; delete[] parent;
-    return bridgeCount;
-}
-*/
 
 void Menu(Grafo &grafo){    //esta es la interfaz del usuario
     cout<<"---SANSABOOK---\n"<<endl;
@@ -495,18 +470,35 @@ void Menu(Grafo &grafo){    //esta es la interfaz del usuario
         }
 
         if(opcion==5){
-            cout<<grafo.encontrar_puentes()<<endl;
+            NodoAdy* puentes = grafo.encontrar_puentes();
+            if(puentes == nullptr){
+                cout << "no existen puentes en el grafo" << endl;
+            } else {
+                cout << "{";
+                NodoAdy* it = puentes;
+                bool primero = true;
+                while(it != nullptr){
+                    if(!primero) cout << ", ";
+                    cout << it->id;
+                    primero = false;
+                    NodoAdy* temp = it;
+                    it = it->sig;
+                    delete temp; // liberar nodo retornado por encontrar_puentes
+                }
+                cout << "}" << endl; 
+            }
         }
 
     }while(opcion!=0);
-    
 }
+
+
 
 
 
 int main(){
 
-    string archivo="datos.txt";
+    string archivo="main.txt";
     Grafo grafo(archivo);
     Menu(grafo);
 
