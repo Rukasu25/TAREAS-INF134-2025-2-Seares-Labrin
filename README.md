@@ -3,7 +3,7 @@
 Tarea 3 de Estructuras de Datos USM
 
 *__Estudiante 1:__ Lukas Labrín
-    __Rol: 202473624-8
+    __Rol:__ 202473624-8
     __OS utilizado:__ Windows 11
     __Versión C/C++ VS Extension:__ 1.28.3
     __Versión compilador:__ 13.3.0
