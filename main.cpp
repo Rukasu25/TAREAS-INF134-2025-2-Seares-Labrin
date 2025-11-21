@@ -1,5 +1,3 @@
-/* || MENSAJE PARA PATOSTARR ||*/
-/* IMPLEMENTAR CLASES DE GRAFO PARA CORRECTO FUNCIONAMIENTO DE CODIGO */
 #include<iostream>
 #include<fstream>
 #include<string>
@@ -7,13 +5,25 @@
 using namespace std;
 
 
-//se crea el struct nodo
+/* ****
+* struct NodoAdy
+******
+* Resumen Estructura:
+* Representa un nodo en la lista de adyacencia del grafo, que contiene el ID del vértice adyacente y un puntero al siguiente nodo en la lista.
+**** */
 struct NodoAdy{
     int id;
     NodoAdy *sig;
 };
 
-//se implementa la clase grafo
+/* ****
+* class Grafo
+******
+* Resumen Clase:
+* Representa un grafo no dirigido utilizando listas de adyacencia. Proporciona métodos para agregar aristas,
+* realizar búsquedas en profundidad (DFS), sugerir amigos, contar comunidades, calcular influencia de usuarios,
+* identificar usuarios populares y encontrar puntos de articulación (puentes) en el grafo.
+**** */
 class Grafo{
 private:
     int NumVertices;
@@ -140,7 +150,13 @@ private:
     }   
 
 public:
-    //constructor del grafo a partir de un archivo
+    /* ****
+    * Grafo
+    ******
+    * Resumen Función
+    * Constructor del grafo a partir de un archivo
+    * *****
+    */
     Grafo(string &archivo){
         fstream file;
         file.open(archivo.c_str(), ios::in);
@@ -172,7 +188,13 @@ public:
 
     }
 
-    //destructor
+    /* ****
+    * ~Grafo
+    ******
+    * Resumen Función
+    * Destructor del grafo, libera la memoria utilizada por las listas enlazadas
+    * 
+    **** */
     ~Grafo(){
         if(adyacencia==NULL) return;
 
@@ -351,9 +373,18 @@ public:
         return id_popular;
     }
 
-//REVISAR
-
-    NodoAdy* encontrar_puentes(){ //funcion 5
+    /* ****
+    * NodoAdy* encontrar_puentes
+    ******
+    * Resumen Función
+    * retorna una lista con los nodos que son puntos de articulación en el grafo
+    * input:
+    * sin inputs
+    ******
+    * Returns:
+    * NodoAdy*
+    **** */
+    NodoAdy* encontrar_puentes(){
         if(NumVertices==0) return nullptr;
 
         //ahora usaremos el dfs especial para ver nodos de articulacion (nodos que al eliminarlos hacen que mi grafo sea desconexo)
@@ -398,18 +429,48 @@ public:
 
     }
 
-    //funcion para obtener el numero de vertices
+    /* ****
+    * int nVertex
+    ******
+    * Resumen Función
+    * Retorna el número de vértices en el grafo.
+    * input:
+    * Ninguno
+    * ******
+    * Returns:
+    * int : número de vértices en el grafo
+    **** */
     int nVertex(){
         return NumVertices;
     }
     
-    //esta funcion se creo para ver si un nodo esta en el grafo o no
+    /* ****
+    * bool existenciaNodo
+    ******
+    * Resumen Función
+    * Verifica si un nodo con el ID dado existe en el grafo.
+    * input:
+    * int id : ID del nodo a verificar
+    * ******
+    * Returns:
+    * bool : true si el nodo existe, false en caso contrario
+    **** */
+
     bool existenciaNodo(int id){
         return id >= 0 && id < NumVertices; //version ultrasimplificada
     }
 };
 
-
+/* ****
+* void Menu
+******
+* Resumen Función:
+* Interfaz de usuario para interactuar con el grafo, dependiendo de la opcion escogida se llama a una funcion distinta del grafo
+* input:
+* Grafo &grafo : referencia al grafo con el que se interactuará
+* returns:
+* void
+**** */
 void Menu(Grafo &grafo){    //esta es la interfaz del usuario
     cout<<"---SANSABOOK---\n"<<endl;
     int opcion;
@@ -492,13 +553,16 @@ void Menu(Grafo &grafo){    //esta es la interfaz del usuario
     }while(opcion!=0);
 }
 
-
-
-
-
+/* ****
+* int main
+******
+* resumen Función: funcion principal que inicializa el grafo, define el archivo para ser abierto y llama al menú de interacción con el usuario
+* input: ninguno
+* returns: int
+**** */
 int main(){
 
-    string archivo="main.txt";
+    string archivo="datos.txt";
     Grafo grafo(archivo);
     Menu(grafo);
 
